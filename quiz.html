@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Quiz Interactivo de Psicoanálisis</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      margin: 0;
+      padding: 0;
+      color: #333;
+      min-height: 100vh;
+    }
+
+    .background-animation {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: -1;
+    }
+
+    .floating-shape {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      animation: float 6s ease-in-out infinite;
+    }
+
+    .floating-shape:nth-child(1) {
+      width: 80px;
+      height: 80px;
+      left: 10%;
+      animation-delay: 0s;
+    }
+
+    .floating-shape:nth-child(2) {
+      width: 60px;
+      height: 60px;
+      left: 80%;
+      animation-delay: 2s;
+    }
+
+    .floating-shape:nth-child(3) {
+      width: 100px;
+      height: 100px;
+      left: 50%;
+      animation-delay: 4s;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-20px) rotate(180deg); }
+    }
+
+    header {
+      text-align: center;
+      padding: 2em 1em;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      color: white;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 2.5em;
+      font-weight: 700;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      animation: fadeInDown 1s ease-out;
+    }
+
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    main {
+      max-width: 1000px;
+      margin: 2em auto;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border-radius: 20px;
+      padding: 2em;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      animation: fadeInUp 1s ease-out 0.3s both;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .quiz-selector {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      padding: 1.5em;
+      border-radius: 15px;
+      margin-bottom: 2em;
+      box-shadow: 0 10px 25px rgba(240, 147, 251, 0.3);
+    }
+
+    .quiz-selector label {
+      color: white;
+      font-weight: 600;
+      font-size: 1.2em;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    }
+
+    select {
+      font-size: 1.1em;
+      padding: 0.8em 1em;
+      border-radius: 10px;
+      border: none;
+      margin-left: 1em;
+      background: white;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    select:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(240, 147, 251, 0.5);
+      transform: translateY(-2px);
+    }
+
+    .quiz-container {
+      margin-top: 2em;
+    }
+
+    .question {
+      margin-bottom: 2em;
+      padding: 1.5em;
+      border-radius: 15px;
+      background: linear-gradient(145deg, #ffffff, #f0f0f0);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      border-left: 5px solid transparent;
+      transition: all 0.3s ease;
+      animation: slideInLeft 0.6s ease-out;
+      animation-fill-mode: both;
+    }
+
+    .question:nth-child(odd) {
+      border-left-color: #667eea;
+    }
+
+    .question:nth-child(even) {
+      border-left-color: #f093fb;
+    }
+
+    .question:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    @keyframes slideInLeft {
+      from {
+        opacity: 0;
+        transform: translateX(-50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    .question h3 {
+      margin: 0 0 1em 0;
+      font-size: 1.3em;
+      font-weight: 600;
+      color: #2d3748;
+      line-height: 1.4;
+    }
+
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8em;
+    }
+
+    .option-container {
+      position: relative;
+      overflow: hidden;
+      border-radius: 12px;
+    }
+
+    .options label {
+      display: block;
+      background: linear-gradient(145deg, #f8f9ff, #e2e8f0);
+      border-radius: 12px;
+      padding: 1em 1.2em;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border: 2px solid transparent;
+      cursor: pointer;
+      position: relative;
+      font-weight: 500;
+    }
+
+    .options input[type="radio"] {
+      margin-right: 12px;
+      transform: scale(1.2);
+      cursor: pointer;
+    }
+
+    .options label:hover {
+      background: linear-gradient(145deg, #e6f3ff, #bfdbfe);
+      transform: translateX(5px);
+      border-color: #3b82f6;
+    }
+
+    .options input[type="radio"]:checked + label {
+      background: linear-gradient(145deg, #3b82f6, #1d4ed8);
+      color: white;
+      border-color: #1e40af;
+      transform: translateX(10px);
+      box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4);
+    }
+
+    .submit-btn {
+      margin-top: 3em;
+      background: linear-gradient(135deg, #4ade80, #22c55e);
+      color: white;
+      border: none;
+      padding: 1em 3em;
+      font-size: 1.2em;
+      font-weight: 600;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 10px 30px rgba(34, 197, 94, 0.4);
+      transition: all 0.3s ease;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .submit-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 35px rgba(34, 197, 94, 0.6);
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+    }
+
+    .submit-btn:active {
+      transform: translateY(-1px);
+    }
+
+    .results {
+      margin-top: 3em;
+      padding: 2em;
+      border-radius: 20px;
+      background: linear-gradient(145deg, #ffffff, #f8fafc);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      animation: fadeIn 0.8s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .results h3 {
+      margin-top: 0;
+      font-size: 2em;
+      font-weight: 700;
+      color: #1f2937;
+      text-align: center;
+      margin-bottom: 1em;
+    }
+
+    .score-display {
+      text-align: center;
+      padding: 2em;
+      background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+      border-radius: 15px;
+      margin-bottom: 2em;
+      border: 2px solid #0ea5e9;
+    }
+
+    .score-number {
+      font-size: 3em;
+      font-weight: 800;
+      color: #0369a1;
+      margin: 0;
+    }
+
+    .score-text {
+      font-size: 1.2em;
+      color: #0f172a;
+      margin: 0.5em 0;
+    }
+
+    .question-review {
+      margin: 1.5em 0;
+      padding: 1.5em;
+      border-radius: 12px;
+      border-left: 5px solid;
+      transition: all 0.3s ease;
+    }
+
+    .question-correct {
+      background: linear-gradient(145deg, #f0fdf4, #dcfce7);
+      border-left-color: #22c55e;
+      box-shadow: 0 4px 15px rgba(34, 197, 94, 0.1);
+    }
+
+    .question-incorrect {
+      background: linear-gradient(145deg, #fef2f2, #fee2e2);
+      border-left-color: #ef4444;
+      box-shadow: 0 4px 15px rgba(239, 68, 68, 0.1);
+    }
+
+    .question-review h4 {
+      margin: 0 0 1em 0;
+      font-size: 1.1em;
+      color: #1f2937;
+    }
+
+    .answer-correct {
+      color: #16a34a;
+      font-weight: 600;
+      padding: 0.5em;
+      background: rgba(34, 197, 94, 0.1);
+      border-radius: 8px;
+      margin: 0.5em 0;
+    }
+
+    .answer-incorrect {
+      color: #dc2626;
+      font-weight: 600;
+      padding: 0.5em;
+      background: rgba(239, 68, 68, 0.1);
+      border-radius: 8px;
+      margin: 0.5em 0;
+    }
+
+    .answer-user {
+      color: #7c3aed;
+      font-weight: 600;
+      padding: 0.5em;
+      background: rgba(124, 58, 237, 0.1);
+      border-radius: 8px;
+      margin: 0.5em 0;
+    }
+
+    .congratulations {
+      text-align: center;
+      padding: 2em;
+      background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+      border-radius: 15px;
+      border: 2px solid #22c55e;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.02); }
+      100% { transform: scale(1); }
+    }
+
+    .congratulations h4 {
+      color: #16a34a;
+      font-size: 1.5em;
+      margin: 0;
+    }
+
+    footer {
+      text-align: center;
+      margin: 3em 0 2em 0;
+      padding: 2em;
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 0.9em;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 15px;
+      max-width: 1000px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    @media (max-width: 768px) {
+      header h1 {
+        font-size: 2em;
+      }
+
+      main {
+        margin: 1em;
+        padding: 1.5em;
+      }
+
+      .quiz-selector {
+        padding: 1em;
+      }
+
+      .quiz-selector label {
+        display: block;
+        margin-bottom: 0.5em;
+      }
+
+      select {
+        margin-left: 0;
+        width: 100%;
+      }
+
+      .question {
+        padding: 1em;
+      }
+
+      .score-number {
+        font-size: 2em;
+      }
+    }
+
+    /* Animación de carga para las preguntas */
+    .question:nth-child(1) { animation-delay: 0.1s; }
+    .question:nth-child(2) { animation-delay: 0.2s; }
+    .question:nth-child(3) { animation-delay: 0.3s; }
+    .question:nth-child(4) { animation-delay: 0.4s; }
+    .question:nth-child(5) { animation-delay: 0.5s; }
+    .question:nth-child(n+6) { animation-delay: 0.6s; }
+  </style>
+</head>
+<body>
+
+<div class="background-animation">
+  <div class="floating-shape"></div>
+  <div class="floating-shape"></div>
+  <div class="floating-shape"></div>
+</div>
+
+<header>
+  <h1>🧠 Quiz Interactivo de Psicoanálisis</h1>
+</header>
+
+<main>
+  <div class="quiz-selector">
+    <label for="quizSelect"><strong>🎯 Elige tu desafío:</strong></label>
+    <select id="quizSelect" aria-label="Selecciona quiz" onchange="loadQuiz()">
+      <option value="">-- Selecciona un tema --</option>
+      <option value="postFreudiano">🔬 Psicoanálisis Post-Freudiano</option>
+      <option value="bionBowlby">👥 Wilfred Bion y John Bowlby</option>
+      <option value="winnicott">🍼 Donald Winnicott</option>
+      <option value="all">🌟 Quiz Completo (Todos los temas)</option>
+    </select>
+  </div>
+
+  <form id="quizForm" class="quiz-container" onsubmit="return checkAnswers()">
+    <!-- Las preguntas se cargarán dinámicamente aquí -->
+  </form>
+
+  <div id="results" class="results" style="display:none;"></div>
+
+</main>
+
+<footer>
+  ✨ Quiz Psicoanálisis 2024 - Diseñado para potenciar tu aprendizaje
+</footer>
+
+<script>
+  // Datos para cada quiz
+  const quizzes = {
+    postFreudiano: [
+      {
+        question: "¿Quién es considerado el padre del psicoanálisis?",
+        options: ["Carl Jung", "Sigmund Freud", "Jacques Lacan", "Melanie Klein"],
+        answer: 1
+      },
+      {
+        question: "¿Qué época se menciona en relación con Freud?",
+        options: ["Época Victoriana", "Era Moderna", "Renacimiento", "Edad Media"],
+        answer: 0
+      },
+      {
+        question: "¿Qué proporciona el psicoanálisis según el contexto?",
+        options: [
+          "Una explicación del sujeto basada en los estudios y descubrimientos de Freud.",
+          "Una guía para escribir novelas",
+          "Un método para resolver problemas matemáticos",
+          "Una teoría económica"
+        ],
+        answer: 0
+      },
+      {
+        question: "¿Cuáles son las principales corrientes post-freudianas mencionadas?",
+        options: ["Escuela Inglesa, Escuela Americana, Escuela Francesa.", "Escuela Alemana, Escuela Italiana", "Escuela China, Escuela Japonesa", "Escuela Rusa, Escuela India"],
+        answer: 0
+      },
+      {
+        question: "¿Qué concepto se refiere a la relación entre el inconsciente y las producciones mentales?",
+        options: ["Consciente", "Inconsciente", "Preconsciente", "Subconsciente"],
+        answer: 1
+      },
+      {
+        question: "¿Qué teoría se centra en el vínculo madre-hijo?",
+        options: ["Teoría de las pulsiones", "Teoría de las relaciones objetales", "Teoría del yo", "Teoría de la mente"],
+        answer: 1
+      },
+      {
+        question: "¿Quiénes son algunos de los representantes de la Escuela Inglesa?",
+        options: ["Melanie Klein", "Donald Winnicott", "John Bowlby", "Todas las anteriores"],
+        answer: 3
+      },
+      {
+        question: "¿Qué enfoque se utiliza en la Escuela Americana?",
+        options: ["Psicología del Yo", "Teoría del Apego", "Psicología de la Personalidad", "Psicoanálisis Kleiniano"],
+        answer: 0
+      },
+      {
+        question: "¿Qué concepto se asocia con la estructura de la personalidad en la Escuela Americana?",
+        options: ["Noción de self", "Complejo de Edipo", "Transferencia", "Realización negativa"],
+        answer: 0
+      },
+      {
+        question: "¿Qué figura es central en la Escuela Francesa del psicoanálisis?",
+        options: ["Jacques Lacan", "Donald Winnicott", "Melanie Klein", "Wilfred Bion"],
+        answer: 0
+      },
+      {
+        question: "¿Qué se entiende por \"transferencia\" en psicoanálisis?",
+        options: [
+          "Proceso en el que el paciente proyecta sentimientos hacia el terapeuta.",
+          "Proceso biológico de memoria",
+          "Relación entre madre e hijo",
+          "Un tipo de terapia grupal"
+        ],
+        answer: 0
+      },
+      {
+        question: "¿Qué noción se relaciona con el desarrollo de la identidad en la Escuela Inglesa?",
+        options: ["Vínculo primario", "Complejo de Edipo", "Teoría de las pulsiones", "Realización negativa"],
+        answer: 0
+      },
+      {
+        question: "¿Qué teoría se deja de lado en muchas de las escuelas post-freudianas?",
+        options: ["Teoría de las pulsiones", "Psicología del Yo", "Teoría del Apego", "Teoría de las relaciones objetales"],
+        answer: 0
+      },
+      {
+        question: "¿Qué es el \"complejo de Edipo\"?",
+        options: [
+          "Un concepto que describe la relación emocional del niño hacia sus padres.",
+          "Un método terapéutico",
+          "Una escuela de pensamiento",
+          "Una técnica de relajación"
+        ],
+        answer: 0
+      },
+      {
+        question: "¿Qué se menciona como una característica del modelo teórico en psicoanálisis?",
+        options: [
+          "Es una construcción teórica abierta y en constante revisión.",
+          "Es un modelo cerrado y estático.",
+          "Se basa en leyes científicas exactas.",
+          "Es una teoría exclusivamente biológica."
+        ],
+        answer: 0
+      }
+    ],
+    bionBowlby: [
+      {
+        question: "¿Dónde nació Wilfred Bion?",
+        options: ["Inglaterra", "India", "Francia", "Estados Unidos"],
+        answer: 1
+      },
+      {
+        question: "¿Qué tipo de psicoanálisis desarrolló Bion?",
+        options: ["Psicoanálisis Freudiano", "Psicoanálisis Kleiniano", "Psicoanálisis Lacaniano", "Psicología Humanista"],
+        answer: 1
+      },
+      {
+        question: "¿Qué perturbaciones detectó Bion en su clínica psicoanalítica?",
+        options: [
+          "Perturbaciones en la memoria",
+          "Perturbaciones en la comunicación con el analista",
+          "Problemas motores",
+          "Alteraciones visuales"
+        ],
+        answer: 1
+      },
+      {
+        question: "¿Cuáles son los dos procesos mentales que Bion identifica en la actividad de pensar?",
+        options: [
+          "Consciente e inconsciente",
+          "Desarrollo de pensamientos y desarrollo del aparato de pensar",
+          "Memoria y atención",
+          "Razonamiento y lógica"
+        ],
+        answer: 1
+      },
+      {
+        question: "¿Qué concepto describe la experiencia emocional del bebé al no encontrar un pecho disponible?",
+        options: ["Realización positiva", "Realización negativa", "Transferencia", "Identificación"],
+        answer: 1
+      },
+      {
+        question: "¿Qué capacidad de la madre es crucial para el desarrollo emocional del bebé según Bion?",
+        options: ["Capacidad intelectual", "Capacidad de reverie", "Capacidad física", "Capacidad financiera"],
+        answer: 1
+      },
+      {
+        question: "¿Qué son los \"elementos beta\" en la teoría de Bion?",
+        options: [
+          "Pensamientos conscientes",
+          "Protopensamientos que son experiencias sensoriales y emocionales primitivas",
+          "Datos matemáticos",
+          "Elementos biológicos"
+        ],
+        answer: 1
+      },
+      {
+        question: "¿Qué función cumple la \"barrera de contacto\" en el aparato de pensar?",
+        options: [
+          "Marca el contacto y la separación entre consciente e inconsciente",
+          "Función motora",
+          "Centro visual",
+          "Centro auditivo"
+        ],
+        answer: 0
+      },
+      {
+        question: "¿Qué tipo de apego estudió John Bowlby?",
+        options: [
+          "Apego emocional entre el niño y la figura materna",
+          "Apego social",
+          "Apego familiar",
+          "Apego laboral"
+        ],
+        answer: 0
+      },
+      {
+        question: "¿Qué influencia tuvo Bowlby en el desarrollo de la teoría del apego?",
+        options: [
+          "Influencia en la biología",
+          "La forma en que los padres tratan a los niños influye en su desarrollo emocional",
+          "Influencia económica",
+          "Influencia política"
+        ],
+        answer: 1
+      },
+      {
+        question: "¿Qué se desarrolla entre los 6 y 12 meses de vida en relación al apego?",
+        options: [
+          "La capacidad motriz",
+          "La capacidad de representación de la imagen de la madre",
+          "La inteligencia verbal",
+          "La memoria a largo plazo"
+        ],
+        answer: 1
+      },
+      {
+        question: "¿Qué hipótesis propone Bowlby sobre la conducta de apego?",
+        options: [
+          "Es un comportamiento adquirido por imitación",
+          "Se organiza mediante un sistema de control dentro del sistema nervioso central",
+          "Es solo un instinto animal",
+          "No existe hipótesis"
+        ],
+        answer: 1
+      },
+      {
+        question: "¿Qué se entiende por \"internalización\" en el contexto de Bowlby?",
+        options: [
+          "El modelo del padre y de sí mismo que se construye en interacción y opera a nivel inconsciente",
+          "Una conducta voluntaria",
+          "Un proceso biológico de maduración",
+          "Un aprendizaje social"
+        ],
+        answer: 0
+      },
+      {
+        question: "¿Qué tipo de pautas de apego tienden a persistir según Bowlby?",
+        options: [
+          "Pautas cortas",
+          "Pautas de apego que se perpetúan en la relación",
+          "Pautas de apego que desaparecen rápidamente",
+          "Ninguna pauta"
+        ],
+        answer: 1
+      },
+      {
+        question: "¿Qué se menciona como una función clave de las relaciones de apego?",
+        options: [
+          "Proporcionar educación formal",
+          "Protección y comunicación mediada por lo emocional",
+          "Relaciones laborales",
+          "Enseñanza religiosa"
+        ],
+        answer: 1
+      }
+    ],
+    winnicott: [
+      {
+        question: "¿En qué año nació Donald Winnicott?",
+        options: ["1896", "1901", "1888", "1920"],
+        answer: 0
+      },
+      {
+        question: "¿Cuál fue la profesión de Winnicott antes de dedicarse al psicoanálisis?",
+        options: ["Psicoanalista", "Médico general", "Pediatra y cirujano", "Psiquiatra"],
+        answer: 2
+      },
+      {
+        question: "¿Con quién tuvo su primer análisis Winnicott?",
+        options: ["J. Strachey", "Sigmund Freud", "Melanie Klein", "John Bowlby"],
+        answer: 0
+      },
+      {
+        question: "¿Qué concepto describe la madre que proporciona un ambiente adecuado para el desarrollo del bebé?",
+        options: ["Madre ideal", "Madre suficientemente buena", "Madre permisiva", "Madre estricta"],
+        answer: 1
+      },
+      {
+        question: "¿Qué tres funciones se asocian con la madre suficientemente buena según Winnicott?",
+        options: [
+          "Holding, handling y presentación de objeto",
+          "Disciplina, educación y afecto",
+          "Cuidado, dieta y juego",
+          "Apoyo, guía y corrección"
+        ],
+        answer: 0
+      },
+      {
+        question: "¿Qué es un \"objeto transicional\" en la teoría de Winnicott?",
+        options: [
+          "Un objeto creado por el bebé que representa al pecho materno",
+          "Un objeto terapéutico",
+          "Un símbolo cultural",
+          "Un objeto inanimado"
+        ],
+        answer: 0
+      },
+      {
+        question: "¿Qué se entiende por \"espacio transicional\"?",
+        options: [
+          "Zona intermedia entre la experiencia del yo y el no-yo, donde se produce la simbolización y la creatividad",
+          "La casa del bebé",
+          "El subconsciente",
+          "El área del cerebro"
+        ],
+        answer: 0
+      },
+      {
+        question: "¿Qué ocurre si la madre falla en su función de cuidado?",
+        options: [
+          "El bebé prospera sin problemas",
+          "El bebé interrumpe su continuidad existencial, lo que puede resultar en trauma",
+          "No ocurre nada",
+          "El bebé se vuelve independiente rápidamente"
+        ],
+        answer: 1
+      },
+      {
+        question: "¿Qué se menciona como una característica del verdadero self?",
+        options: [
+          "Es capaz de crear y ser sentido como real",
+          "Es reactivo y no espontáneo",
+          "Es un falso concepto",
+          "Es un constructo social"
+        ],
+        answer: 0
+      },
+      {
+        question: "¿Qué es el \"falso self\" según Winnicott?",
+        options: [
+          "Es reactivo y no espontáneo, diseñado para ocultar y proteger al verdadero self",
+          "Es el verdadero ser interior",
+          "Una enfermedad mental",
+          "Una técnica terapéutica"
+        ],
+        answer: 0
+      },
+      {
+        question: "¿Qué tipo de necesidades se relacionan con el desarrollo del verdadero self?",
+        options: [
+          "Necesidades biológicas",
+          "Necesidades sociales",
+          "Necesidades del ego",
+          "Necesidades económicas"
+        ],
+        answer: 2
+      },
+      {
+        question: "¿Qué papel juega la \"preocupación maternal primaria\"?",
+        options: [
+          "Es un estado donde la madre se centra intensamente en el bebé, desconectándose del medio",
+          "Es la falta de interés maternal",
+          "Es responsabilidad del médico",
+          "Una fase negativa"
+        ],
+        answer: 0
+      },
+      {
+        question: "¿Qué se entiende por \"dependencia absoluta\" en el desarrollo del niño?",
+        options: [
+          "El niño no depende de nadie",
+          "La fase en la que el bebé depende completamente de la madre",
+          "La independencia total",
+          "Una fase médica"
+        ],
+        answer: 1
+      },
+      {
+        question: "¿Qué se busca lograr a través del proceso de desilusión en el desarrollo infantil?",
+        options: [
+          "Que el niño reconozca que el mundo no puede crearse solo a partir de la necesidad y la imaginación",
+          "Que el niño sea feliz siempre",
+          "Que el niño dependa más de la madre",
+          "Que el niño sea obediente"
+        ],
+        answer: 0
+      },
+      {
+        question: "¿Cómo se relacionan las necesidades instintivas con el descubrimiento de la realidad externa?",
+        options: [
+          "Promueven experiencias que llevan al niño a interactuar con objetos adecuados, facilitando el descubrimiento de la realidad",
+          "No tienen relación",
+          "Solo causan problemas",
+          "Restringen la experiencia"
+        ],
+        answer: 0
+      }
+    ]
+  };
+
+  // La opción "all" combinará todas las preguntas de los tres quizzes anteriores
+  function combineAllQuizzes() {
+    let allQuestions = [];
+    for (let key in quizzes) {
+      allQuestions = allQuestions.concat(quizzes[key]);
+    }
+    return allQuestions;
+  }
+
+  // Carga las preguntas según la selección
+  function loadQuiz() {
+    const quizSelect = document.getElementById("quizSelect");
+    const selected = quizSelect.value;
+    const quizForm = document.getElementById("quizForm");
+    const results = document.getElementById("results");
+    results.style.display = "none";
+    results.innerHTML = "";
+    quizForm.innerHTML = "";
+
+    if (!selected) return;
+
+    let questionsToLoad = [];
+    if (selected === "all") {
+      questionsToLoad = combineAllQuizzes();
+    } else {
+      questionsToLoad = quizzes[selected];
+    }
+
+    questionsToLoad.forEach((q, index) => {
+      const questionId = `q${index}`;
+      let optionsHTML = q.options.map((option, i) => {
+        const optionId = `${questionId}_option${i}`;
+        return `
+          <div class="option-container">
+            <input type="radio" id="${optionId}" name="${questionId}" value="${i}" />
+            <label for="${optionId}">${option}</label>
+          </div>`;
+      }).join("\n");
+
+      quizForm.innerHTML += `
+        <section class="question" aria-live="polite" aria-atomic="true">
+          <h3>📝 Pregunta ${index + 1}: ${q.question}</h3>
+          <div class="options">
+            ${optionsHTML}
+          </div>
+        </section>
+      `;
+    });
+
+    quizForm.innerHTML += `<button type="submit" class="submit-btn" aria-label="Enviar respuestas">🚀 Enviar Respuestas</button>`;
+  }
+
+  // Comprobar y mostrar los resultados
+  function checkAnswers() {
+    const quizSelect = document.getElementById("quizSelect");
+    const selected = quizSelect.value;
+    const results = document.getElementById("results");
+
+    let questions = [];
+    if (selected === "all") {
+      questions = combineAllQuizzes();
+    } else {
+      questions = quizzes[selected];
+    }
+    const total = questions.length;
+
+    let correctAnswers = [];
+    let incorrectAnswers = [];
+
+    for (let i = 0; i < total; i++) {
+      const qName = `q${i}`;
+      const selectedOption = document.querySelector(`input[name="${qName}"]:checked`);
+
+      if (!selectedOption) {
+        // No contestado -> se cuenta como incorrecto
+        incorrectAnswers.push({
+          index: i,
+          question: questions[i].question,
+          correctAnswer: questions[i].options[questions[i].answer],
+          userAnswer: null,
+          isAnswered: false
+        });
+        continue;
+      }
+
+      const userAnswerIndex = parseInt(selectedOption.value);
+      if (userAnswerIndex === questions[i].answer) {
+        correctAnswers.push({
+          index: i,
+          question: questions[i].question,
+          correctAnswer: questions[i].options[questions[i].answer],
+          userAnswer: questions[i].options[userAnswerIndex]
+        });
+      } else {
+        incorrectAnswers.push({
+          index: i,
+          question: questions[i].question,
+          correctAnswer: questions[i].options[questions[i].answer],
+          userAnswer: questions[i].options[userAnswerIndex],
+          isAnswered: true
+        });
+      }
+    }
+
+    // Mostrar resultados
+    const correctCount = correctAnswers.length;
+    const percentage = Math.round((correctCount / total) * 100);
+
+    let html = `
+      <h3>📊 Resultados del Quiz</h3>
+      <div class="score-display">
+        <div class="score-number">${correctCount}/${total}</div>
+        <div class="score-text">Puntuación: ${percentage}%</div>
+      </div>
+    `;
+
+    if (correctCount === total) {
+      html += `
+        <div class="congratulations">
+          <h4>🎉 ¡Excelente trabajo!</h4>
+          <p>¡Has respondido todas las preguntas correctamente! Tienes un dominio excepcional del tema.</p>
+        </div>
+      `;
+    }
+
+    // Mostrar respuestas correctas
+    if (correctAnswers.length > 0) {
+      html += `<h4 style="color: #16a34a; margin-top: 2em;">✅ Respuestas Correctas (${correctAnswers.length})</h4>`;
+      correctAnswers.forEach(item => {
+        html += `
+          <div class="question-review question-correct">
+            <h4>Pregunta ${item.index + 1}: ${item.question}</h4>
+            <div class="answer-correct">✓ Tu respuesta: ${item.userAnswer}</div>
+          </div>
+        `;
+      });
+    }
+
+    // Mostrar respuestas incorrectas
+    if (incorrectAnswers.length > 0) {
+      html += `<h4 style="color: #dc2626; margin-top: 2em;">❌ Respuestas a Revisar (${incorrectAnswers.length})</h4>`;
+      incorrectAnswers.forEach(item => {
+        html += `
+          <div class="question-review question-incorrect">
+            <h4>Pregunta ${item.index + 1}: ${item.question}</h4>
+            ${item.isAnswered ?
+                `<div class="answer-user">Tu respuesta: ${item.userAnswer}</div>` :
+                `<div class="answer-incorrect">❌ No respondida</div>`
+        }
+            <div class="answer-correct">✓ Respuesta correcta: ${item.correctAnswer}</div>
+          </div>
+        `;
+      });
+    }
+
+    results.style.display = "block";
+    results.innerHTML = html;
+
+    // Scroll suave a resultados
+    results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    return false; // Para prevenir submit de formulario y recarga
+  }
+</script>
+
+</body>
+</html>
